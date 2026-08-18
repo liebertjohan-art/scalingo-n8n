@@ -21,10 +21,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '22'
 
-      - name: Update n8n to Always Latest
-        run: npm install n8n@latest
+      - name: Initialize package.json if missing & Update n8n
+        run: |
+          if [ ! -f package.json ]; then
+            npm init -y
+          fi
+          # Latest version fetch karke package.json me pin karta hai
+          LATEST_VERSION=$(npm view n8n version)
+          npm install n8n@$LATEST_VERSION --package-lock-only --no-audit
 
       - name: Check for updates
         id: check_changes
@@ -53,9 +59,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          # Scalingo ka host key add karna taaki prompt na aaye
           ssh-keyscan ssh.osc-fr1.scalingo.com >> ~/.ssh/known_hosts
           
-          git remote add scalingo $SCALINGO_URL
-          # GitHub ki 'main' branch ko Scalingo ki 'master' pe force push kar raha hai
+          git remote add scalingo $SCALINGO_URL || git remote set-url scalingo $SCALINGO_URL
           git push scalingo main:master -f
