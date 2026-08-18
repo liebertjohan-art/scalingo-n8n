@@ -1,0 +1,61 @@
+name: N8N Auto Update & Deploy
+
+on:
+  schedule:
+    # 20:30 UTC = 2:00 AM IST
+    - cron: '30 20 * * *'
+  workflow_dispatch:
+
+jobs:
+  update-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Update n8n to Always Latest
+        run: npm install n8n@latest
+
+      - name: Check for updates
+        id: check_changes
+        run: |
+          if [[ -n $(git status -s) ]]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit changes to main
+        if: steps.check_changes.outputs.has_changes == 'true'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add package.json package-lock.json
+          git commit -m "Auto-update: Bumped n8n to latest version"
+          git push origin main
+
+      - name: Deploy to Scalingo
+        if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          SSH_KEY: ${{ secrets.SCALINGO_SSH_KEY }}
+          SCALINGO_URL: ${{ secrets.SCALINGO_GIT_URL }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          # Scalingo ka host key add karna taaki prompt na aaye
+          ssh-keyscan ssh.osc-fr1.scalingo.com >> ~/.ssh/known_hosts
+          
+          git remote add scalingo $SCALINGO_URL
+          # GitHub ki 'main' branch ko Scalingo ki 'master' pe force push kar raha hai
+          git push scalingo main:master -f
