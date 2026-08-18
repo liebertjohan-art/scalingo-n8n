@@ -13,10 +13,11 @@ jobs:
       contents: write
 
     steps:
-      - name: Checkout Repo
+      - name: Checkout Repo (Full History)
         uses: actions/checkout@v4
         with:
           ref: main
+          fetch-depth: 0 # Scalingo shallow clone allow nahi karta
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -28,7 +29,6 @@ jobs:
           if [ ! -f package.json ]; then
             npm init -y
           fi
-          # Latest version fetch karke package.json me pin karta hai
           LATEST_VERSION=$(npm view n8n version)
           npm install n8n@$LATEST_VERSION --package-lock-only --no-audit
 
