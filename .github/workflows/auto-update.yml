@@ -2,12 +2,14 @@ name: N8N Auto Update & Deploy
 
 on:
   schedule:
-    - cron: '30 20 * * *'
+    - cron: "30 20 * * *"
   workflow_dispatch:
 
 jobs:
   update-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout Repo
@@ -19,7 +21,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: "22"
 
       - name: Prepare Clean App Manifest
         run: |
@@ -29,32 +31,23 @@ jobs:
             "name": "scalingo-n8n",
             "version": "1.0.0",
             "scripts": {
-              "start": "n8n start"
+              "start": "./start.sh"
             },
             "dependencies": {
               "n8n": "$LATEST_VERSION"
             },
             "engines": {
-              "node": "20.x"
+              "node": ">=20.x"
             }
           }
-          EOF
-
-          echo "web: n8n start" > Procfile
-
-          cat << 'EOF' > .slugignore
-          .git
-          .github
-          *.md
-          *.txt
           EOF
 
       - name: Commit manifest changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json Procfile .slugignore
-          git commit -m "Auto-update: Bump n8n" || echo "No changes"
+          git add package.json Procfile start.sh .slugignore
+          git commit -m "Auto-update: Bump n8n to latest" || echo "No changes"
           git push origin main || echo "Already synced"
 
       - name: Deploy to Scalingo

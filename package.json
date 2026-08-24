@@ -1,24 +1,13 @@
 {
   "name": "scalingo-n8n",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku-postbuild": "npm cache clean --force && rm -rf ~/.npm ~/.cache /tmp/* node_modules/@n8n/core/test node_modules/**/docs node_modules/**/*.md"
+    "start": "./start.sh"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/liebertjohan-art/scalingo-n8n.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/liebertjohan-art/scalingo-n8n/issues"
-  },
-  "homepage": "https://github.com/liebertjohan-art/scalingo-n8n#readme",
   "dependencies": {
-    "n8n": "^2.35.3"
+    "n8n": "^2.35.7"
+  },
+  "engines": {
+    "node": ">=20.x"
   }
 }
