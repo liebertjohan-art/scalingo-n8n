@@ -2,4 +2,4 @@
 .github
 *.md
 *.txt
-.npm
+package-lock.json
