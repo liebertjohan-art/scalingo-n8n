@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-export NODE_OPTIONS="--max-old-space-size=768"
+export NODE_OPTIONS="--max-old-space-size=1024"
 
 if [ -n "$PORT" ]; then
   export N8N_PORT="$PORT"
@@ -25,4 +25,8 @@ eval "$(node -e '
   }
 ')"
 
-exec n8n start
+if [ -f "./node_modules/n8n/bin/n8n" ]; then
+  exec node --max-old-space-size=1024 ./node_modules/n8n/bin/n8n start
+else
+  exec n8n start
+fi
