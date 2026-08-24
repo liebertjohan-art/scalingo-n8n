@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+export NODE_OPTIONS="--max-old-space-size=768"
+
 if [ -n "$PORT" ]; then
   export N8N_PORT="$PORT"
 fi
