@@ -5,7 +5,7 @@
     "start": "./start.sh"
   },
   "dependencies": {
-    "n8n": "2.36.8"
+    "n8n": "2.36.9"
   },
   "engines": {
     "node": "22.x"
