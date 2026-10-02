@@ -21,26 +21,40 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: "22"
+          node-version: "24"
 
       - name: Prepare Clean App Manifest
         run: |
-          LATEST_VERSION=$(npm view n8n version)
-          cat << EOF > package.json
-          {
-            "name": "scalingo-n8n",
-            "version": "1.0.0",
-            "scripts": {
-              "start": "./start.sh"
-            },
-            "dependencies": {
-              "n8n": "$LATEST_VERSION"
-            },
-            "engines": {
-              "node": "22.x"
-            }
-          }
-          EOF
+          node -e '
+            const fs = require("fs");
+            const { execSync } = require("child_process");
+
+            const latestVersion = execSync("npm view n8n version").toString().trim();
+
+            let nodeVersion = "24.x";
+            try {
+              const raw = JSON.parse(execSync("npm view n8n engines.node --json").toString());
+              const str = Array.isArray(raw) ? raw[raw.length - 1] : raw;
+              const match = String(str).match(/(\d+)/);
+              if (match) nodeVersion = `${match[1]}.x`;
+            } catch (err) {}
+
+            const manifest = {
+              name: "scalingo-n8n",
+              version: "1.0.0",
+              scripts: {
+                start: "./start.sh"
+              },
+              dependencies: {
+                n8n: latestVersion
+              },
+              engines: {
+                node: nodeVersion
+              }
+            };
+
+            fs.writeFileSync("package.json", JSON.stringify(manifest, null, 2) + "\n");
+          '
 
       - name: Commit manifest changes
         run: |
