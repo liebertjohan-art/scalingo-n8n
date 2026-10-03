@@ -24,8 +24,14 @@ eval "$(node -e '
     }
   }
 ')"
-mkdir -p "$HOME/.n8n/custom"
-ln -sfn "$(pwd)/node_modules" "$HOME/.n8n/custom/node_modules"
+mkdir -p "$HOME/.n8n/custom/node_modules"
+for pkg in node_modules/n8n-nodes-* node_modules/@*/n8n-nodes-*; do
+  if [ -d "$pkg" ]; then
+    rel_path="${pkg#node_modules/}"
+    mkdir -p "$HOME/.n8n/custom/node_modules/$(dirname "$rel_path")"
+    ln -sfn "$(pwd)/$pkg" "$HOME/.n8n/custom/node_modules/$rel_path"
+  fi
+done
 export N8N_CUSTOM_EXTENSIONS="$HOME/.n8n/custom"
 
 if [ -f "./node_modules/n8n/bin/n8n" ]; then

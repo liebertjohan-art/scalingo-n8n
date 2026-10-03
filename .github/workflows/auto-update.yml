@@ -66,5 +66,18 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ssh.osc-fr1.scalingo.com >> ~/.ssh/known_hosts
 
+          APP_NAME=$(basename "$SCALINGO_URL" .git)
+          echo "::add-mask::$APP_NAME"
+
           git remote add scalingo $SCALINGO_URL || git remote set-url scalingo $SCALINGO_URL
-          git push scalingo main:master -f
+
+          set +e
+          OUTPUT=$(git push scalingo main:master -f 2>&1)
+          STATUS=$?
+          if [ $STATUS -eq 0 ]; then
+            echo "Scalingo deployment completed."
+          else
+            echo "Scalingo deployment failed with code $STATUS."
+            echo "$OUTPUT" | grep -Ei "error|fatal|fail" || echo "Deployment error occurred."
+            exit $STATUS
+          fi
