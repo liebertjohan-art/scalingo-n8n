@@ -78,6 +78,6 @@ jobs:
             echo "Scalingo deployment completed."
           else
             echo "Scalingo deployment failed with code $STATUS."
-            echo "$OUTPUT" | grep -Ei "error|fatal|fail" || echo "Deployment error occurred."
+            echo "Check private Scalingo dashboard for logs."
             exit $STATUS
           fi
