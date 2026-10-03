@@ -31,7 +31,7 @@ node -e '
   const customDir = path.join(process.env.HOME, ".n8n", "custom", "node_modules");
   fs.mkdirSync(customDir, { recursive: true });
   for (const dep of Object.keys(pkg.dependencies || {})) {
-    if (dep === "n8n" || dep === "n8n-nodes-base") continue;
+    if (dep === "n8n" || dep === "n8n-nodes-base" || dep === "pg") continue;
     const src = path.resolve("node_modules", dep);
     if (!fs.existsSync(src)) continue;
     const dest = path.join(customDir, dep);
@@ -41,6 +41,8 @@ node -e '
   }
 '
 export N8N_CUSTOM_EXTENSIONS="$HOME/.n8n/custom"
+
+node ./migrate.js || true
 
 if [ -f "./node_modules/n8n/bin/n8n" ]; then
   exec node --max-old-space-size=1024 ./node_modules/n8n/bin/n8n start
