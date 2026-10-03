@@ -24,6 +24,9 @@ eval "$(node -e '
     }
   }
 ')"
+mkdir -p "$HOME/.n8n/custom"
+ln -sfn "$(pwd)/node_modules" "$HOME/.n8n/custom/node_modules"
+export N8N_CUSTOM_EXTENSIONS="$HOME/.n8n/custom"
 
 if [ -f "./node_modules/n8n/bin/n8n" ]; then
   exec node --max-old-space-size=1024 ./node_modules/n8n/bin/n8n start

@@ -39,21 +39,13 @@ jobs:
               if (match) nodeVersion = `${match[1]}.x`;
             } catch (err) {}
 
-            const manifest = {
-              name: "scalingo-n8n",
-              version: "1.0.0",
-              scripts: {
-                start: "./start.sh"
-              },
-              dependencies: {
-                n8n: latestVersion
-              },
-              engines: {
-                node: nodeVersion
-              }
-            };
+            const existing = JSON.parse(fs.readFileSync("package.json", "utf8"));
+            existing.dependencies = existing.dependencies || {};
+            existing.dependencies.n8n = latestVersion;
+            existing.engines = existing.engines || {};
+            existing.engines.node = nodeVersion;
 
-            fs.writeFileSync("package.json", JSON.stringify(manifest, null, 2) + "\n");
+            fs.writeFileSync("package.json", JSON.stringify(existing, null, 2) + "\n");
           '
 
       - name: Commit manifest changes

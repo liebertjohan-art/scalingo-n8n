@@ -5,7 +5,12 @@
     "start": "./start.sh"
   },
   "dependencies": {
-    "n8n": "2.41.6"
+    "@jordanburke/n8n-nodes-discord": "^0.6.0",
+    "n8n": "2.41.6",
+    "n8n-nodes-groq": "^0.2.0",
+    "n8n-nodes-pdforge": "^2.3.3",
+    "n8n-nodes-qrcode": "^0.1.0",
+    "n8n-nodes-text-manipulation": "^1.4.0"
   },
   "engines": {
     "node": "24.x"
